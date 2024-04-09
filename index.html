@@ -1,0 +1,107 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="UTF-8"/>
+	<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+	<title>Todo</title>
+</head>
+<body>
+	<!-- CSS Style -->
+	<style>
+		:root {
+			font-family: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif;
+			line-height: 1.5;
+			font-weight: 400;
+
+			color-scheme: light dark;
+			color: rgba(255, 255, 255, .87);
+			background-color: #242424;
+		}
+
+		.container {
+			display: flex;
+			flex-direction: column;
+			justify-content: center;
+			align-items: center;
+		}
+
+		.date {
+			font-weight: 800;
+			font-size: x-large;
+		}
+
+		.todo-box {
+			min-width: 400px;
+			width: 40vw;
+			height: 80vh;
+			padding: 10px;
+			margin: 5px;
+			border-radius: 50px 50px 0 0;
+			background-color: #ffffffcc;
+		}
+
+		.input-area {
+			display: flex;
+			justify-content: space-between;
+			min-width: 400px;
+			width: 40vw;
+			padding: 10px;
+			background-color: #ffffffcc;
+			border-radius: 0 0 20px 20px;
+		}
+
+		.text {
+			width: 100%;
+			height: 50px;
+			border-bottom-left-radius: 15px;
+			background-color: #ffffff;
+			margin-right: 5px;
+			padding: 10px;
+			border: none;
+			color: black;
+		}
+
+		.btn {
+			min-width: 50px;
+			width: 5vw;
+			height: 50px;
+			padding: 10px;
+			border-bottom-right-radius: 15px;
+			background-color: #ffffffcc;
+			color: black;
+			display: flex;
+			justify-content: center;
+			align-items: center;
+			cursor: pointer;
+			user-select: none;
+		}
+
+		.btn:hover {
+			background-color: #e8ffc3;
+		}
+	</style>
+
+	<!-- HTML Body  -->
+	<div class="container">
+		<div class="date">2024/04/09(火)</div>
+		<div class="todo-box"></div>
+		<div class="input-area">
+			<input class="text" type="text"/>
+			<div class="btn">Add</div>
+		</div>
+	</div>
+
+	<!-- Javascript  -->
+	<script type="module" defer>
+		const dateElement = document.getElementsByClassName('date')[0];
+		const today = new Date();
+		const option = {
+			year: "numeric",
+			month: "2-digit",
+			day: "2-digit",
+			weekday: 'short',
+		}
+		dateElement.innerText = today.toLocaleDateString(undefined, option);
+	</script>
+</body>
+</html>
