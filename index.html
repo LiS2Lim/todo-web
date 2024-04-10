@@ -4,8 +4,6 @@
 	<meta charset="UTF-8"/>
 	<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
 	<title>Todo</title>
-</head>
-<body>
 	<!-- CSS Style -->
 	<style>
 		:root {
@@ -50,15 +48,26 @@
 			border-radius: 0 0 20px 20px;
 		}
 
-		.text {
-			width: 100%;
+		.label {
 			height: 50px;
+			padding: 10px;
+			width: 100%;
+			margin-right: 5px;
 			border-bottom-left-radius: 15px;
 			background-color: #ffffff;
-			margin-right: 5px;
-			padding: 10px;
 			border: none;
-			color: black;
+		}
+
+		.text {
+			width: 100%;
+			height: 100%;
+			color: #000000;
+			border-bottom-left-radius: 15px;
+			border: none;
+		}
+
+		.text:focus {
+			outline: none;
 		}
 
 		.btn {
@@ -80,13 +89,16 @@
 			background-color: #e8ffc3;
 		}
 	</style>
-
+</head>
+<body>
 	<!-- HTML Body  -->
 	<div class="container">
 		<div class="date">2024/04/09(火)</div>
 		<div class="todo-box"></div>
 		<div class="input-area">
-			<input class="text" type="text"/>
+			<label class="label">
+				<input class="text" type="text"/>
+			</label>
 			<div class="btn">Add</div>
 		</div>
 	</div>
