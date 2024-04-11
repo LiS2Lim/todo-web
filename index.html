@@ -38,6 +38,22 @@
 			background-color: #ffffffcc;
 		}
 
+		.todo-item {
+			color: #000000;
+			font-size: x-large;
+			user-select: none;
+			cursor: pointer;
+		}
+
+		.todo-item:hover {
+			color: red;
+		}
+
+		.deleted {
+			text-decoration: line-through;
+			color: darkgray;
+		}
+
 		.input-area {
 			display: flex;
 			justify-content: space-between;
@@ -62,6 +78,7 @@
 			width: 100%;
 			height: 100%;
 			color: #000000;
+			background-color: #ffffff;
 			border-bottom-left-radius: 15px;
 			border: none;
 		}
@@ -93,19 +110,25 @@
 <body>
 	<!-- HTML Body  -->
 	<div class="container">
+		<!-- Date display area -->
 		<div class="date">2024/04/09(火)</div>
-		<div class="todo-box"></div>
+		<!-- Todo-List display area -->
+		<div class="todo-box">
+			<ul id="todo-list"></ul>
+		</div>
+		<!-- Inputbox display area -->
 		<div class="input-area">
 			<label class="label">
-				<input class="text" type="text"/>
+				<input id="text" class="text" type="text" autocomplete="off"/>
 			</label>
-			<div class="btn">Add</div>
+			<div id="btn-add" class="btn">Add</div>
 		</div>
 	</div>
 
 	<!-- Javascript  -->
 	<script type="module" defer>
-		const dateElement = document.getElementsByClassName('date')[0];
+		//// 상단의 날짜 표시
+		const dateElement = document.getElementsByClassName("date")[0];
 		const today = new Date();
 		const option = {
 			year: "numeric",
@@ -114,6 +137,64 @@
 			weekday: 'short',
 		}
 		dateElement.innerText = today.toLocaleDateString(undefined, option);
+		
+		//// 투두리스트를 보관하는 todoList배열
+		const todoList = [
+			"투두 리스트를 로컬스토리지에 저장하기(DB로 저장 전환하기 쉽도록 인터페이스로 연결?)", 
+			"취소선이 그어지면 삭제 버튼 표시되게 하기", 
+			"삭제 기능 추가하기",
+			"취소선 그어진 투두아이템 한꺼번에 삭제하는 버튼추가",
+			"등록된 내용 편집 기능 추가하기",
+			"글자 길이에 제한두기, 혹은 길어졌을 떄 처리하기", 
+			"리스트가 많아지면 스크롤바 표시",
+			"투두리스트의 순서를 바꿀 수 있게하기",
+			"투두리스트 UI를 체크박스 형태로 변경",
+			"상단 날짜 영역에 시간도 같이 표시하기(시:분:초)",
+		];
+
+		//// 투두리스트의 아이템을 클릭했을 때 취소선 긋는 함수
+		const elList = document.getElementById("todo-list");
+		const deletedList = (e) => {
+			const isContains = e.target.classList.contains("deleted");
+			if (isContains) {
+				e.target.classList.remove("deleted");
+			} else {
+				e.target.classList.add("deleted");
+			}
+		}
+
+		//// 투두리스트 영역에 아이템을 추가하는 함수
+		const createTodoItem = (text) => {
+			const elLi = document.createElement("li");
+			elLi.innerText = text;
+			elLi.classList.add("todo-item");
+			elLi.addEventListener("click", deletedList);
+			elList.appendChild(elLi);
+		}
+
+		//// 입력된 텍스트를 가져와 투두리스트와 배열에 추가하는 함수
+		const addTodoItem = () => {
+			const text = document.getElementById("text");
+			if (text.value == "") return;
+			createTodoItem(text.value);
+			todoList.push(text.value);
+			text.value = "";
+		}
+
+		//// 리스트 전체를 순회하며 해당 텍스트를 투두리스트 영역에 추가
+		todoList.forEach(s => createTodoItem(s));
+
+		//// Add버튼을 클릭했을 때 투두리스트가 추가되도록 이벤트 리스닝 추가
+		const btnAdd = document.getElementById("btn-add");
+		btnAdd.addEventListener("click", addTodoItem);
+
+		//// 텍스트박스에서 엔터를 눌러도 등록 동작이 실행되도록
+		const text = document.getElementById("text");
+		text.addEventListener("keypress", (e) => {
+			if (e.keyCode === 13) {
+				addTodoItem();
+			}
+		})
 	</script>
 </body>
 </html>
