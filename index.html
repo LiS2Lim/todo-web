@@ -127,20 +127,8 @@
 
 	<!-- Javascript  -->
 	<script type="module" defer>
-		//// 상단의 날짜 표시
-		const dateElement = document.getElementsByClassName("date")[0];
-		const today = new Date();
-		const option = {
-			year: "numeric",
-			month: "2-digit",
-			day: "2-digit",
-			weekday: 'short',
-		}
-		dateElement.innerText = today.toLocaleDateString(undefined, option);
-		
-		//// 투두리스트를 보관하는 todoList배열
-		const todoList = [
-			"투두 리스트를 로컬스토리지에 저장하기(DB로 저장 전환하기 쉽도록 인터페이스로 연결?)", 
+		/*
+			DONE "투두 리스트를 로컬스토리지에 저장하기(DB로 저장 전환하기 쉽도록 인터페이스로 연결?)", 
 			"취소선이 그어지면 삭제 버튼 표시되게 하기", 
 			"삭제 기능 추가하기",
 			"취소선 그어진 투두아이템 한꺼번에 삭제하는 버튼추가",
@@ -150,7 +138,26 @@
 			"투두리스트의 순서를 바꿀 수 있게하기",
 			"투두리스트 UI를 체크박스 형태로 변경",
 			"상단 날짜 영역에 시간도 같이 표시하기(시:분:초)",
-		];
+		*/
+
+		/* ############### Functions start ################# */
+
+		//// 로컬스토리지에 투두리스트를 추가하는 함수
+		const addLocalStorage = (todo) => {
+			todoList.push(todo);
+			localStorage.setItem('todoList', JSON.stringify(todoList));
+		};
+		
+		//// 투두리스트 영역에 아이템을 추가하는 함수
+		const createTodoItem = (text) => {
+			const elLi = document.createElement("li");
+			elLi.innerText = text;
+			elLi.classList.add("todo-item");
+			elLi.addEventListener("click", deletedList);
+			elList.appendChild(elLi);
+			//로컬스토리지에도 추가
+			addLocalStorage(text);
+		}
 
 		//// 투두리스트의 아이템을 클릭했을 때 취소선 긋는 함수
 		const elList = document.getElementById("todo-list");
@@ -163,26 +170,48 @@
 			}
 		}
 
-		//// 투두리스트 영역에 아이템을 추가하는 함수
-		const createTodoItem = (text) => {
-			const elLi = document.createElement("li");
-			elLi.innerText = text;
-			elLi.classList.add("todo-item");
-			elLi.addEventListener("click", deletedList);
-			elList.appendChild(elLi);
-		}
-
 		//// 입력된 텍스트를 가져와 투두리스트와 배열에 추가하는 함수
 		const addTodoItem = () => {
 			const text = document.getElementById("text");
 			if (text.value == "") return;
 			createTodoItem(text.value);
-			todoList.push(text.value);
 			text.value = "";
 		}
+		/* ############### Functions end ################# */
 
-		//// 리스트 전체를 순회하며 해당 텍스트를 투두리스트 영역에 추가
-		todoList.forEach(s => createTodoItem(s));
+		//// 상단의 날짜 표시
+		const dateElement = document.getElementsByClassName("date")[0];
+		const today = new Date();
+		const option = {
+			year: "numeric",
+			month: "2-digit",
+			day: "2-digit",
+			weekday: 'short',
+		}
+		dateElement.innerText = today.toLocaleDateString(undefined, option);
+
+		////투두리스트 변수 선언
+		let todoList = [];
+		
+		////로컬스토리지에서 저장된 데이터를 가져옴
+		let storageList = localStorage.getItem('todoList');
+
+		////데이터가 존재하면 파싱하여 todoList에 세팅
+		////존재하지 않으면 빈 배열을 로컬스토리지에 저장
+		if (storageList) {
+			todoList = JSON.parse(storageList);
+		} else {
+			localStorage.setItem('todoList', JSON.stringify(todoList));
+		}
+
+		////투두리스트 전체를 순회하며 투두리스트 영역에 추가
+		todoList.forEach(text => {
+			const liElement = document.createElement("li");
+			liElement.innerText = text;
+			liElement.classList.add("todo-item");
+			liElement.addEventListener("click", deletedList);
+			elList.appendChild(liElement);
+		});
 
 		//// Add버튼을 클릭했을 때 투두리스트가 추가되도록 이벤트 리스닝 추가
 		const btnAdd = document.getElementById("btn-add");
@@ -195,6 +224,7 @@
 				addTodoItem();
 			}
 		})
+		
 	</script>
 </body>
 </html>
