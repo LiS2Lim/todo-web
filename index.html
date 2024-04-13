@@ -83,6 +83,15 @@
 			border: none;
 		}
 
+		.delete-button {
+			margin-left: 10px;
+			cursor: pointer;
+		}
+
+		.delete-button:hover {
+			background-color: red;
+		}
+
 		.text:focus {
 			outline: none;
 		}
@@ -127,41 +136,45 @@
 
 	<!-- Javascript  -->
 	<script type="module" defer>
-		/*
-			DONE "투두 리스트를 로컬스토리지에 저장하기(DB로 저장 전환하기 쉽도록 인터페이스로 연결?)", 
-			"취소선이 그어지면 삭제 버튼 표시되게 하기", 
-			"삭제 기능 추가하기",
-			"취소선 그어진 투두아이템 한꺼번에 삭제하는 버튼추가",
-			"등록된 내용 편집 기능 추가하기",
-			"글자 길이에 제한두기, 혹은 길어졌을 떄 처리하기", 
-			"리스트가 많아지면 스크롤바 표시",
-			"투두리스트의 순서를 바꿀 수 있게하기",
-			"투두리스트 UI를 체크박스 형태로 변경",
-			"상단 날짜 영역에 시간도 같이 표시하기(시:분:초)",
-		*/
 
-		/* ############### Functions start ################# */
+		const elList = document.getElementById("todo-list");
 
-		//// 로컬스토리지에 투두리스트를 추가하는 함수
+		/** 
+		 * 로컬스토리지에 투두리스트를 추가하는 함수
+		 */ 
 		const addLocalStorage = (todo) => {
 			todoList.push(todo);
 			localStorage.setItem('todoList', JSON.stringify(todoList));
 		};
 		
-		//// 투두리스트 영역에 아이템을 추가하는 함수
+		/** 
+		 * 로컬스토리지에 투두리스트를 삭제하는 함수
+		 */
+		const removeLocalStorage = (todo) => {
+			todoList.splice(todoList.indexOf(todo), 1);
+			localStorage.setItem('todoList', JSON.stringify(todoList));
+		}
+
+		/** 
+		 * 투두리스트 영역에 아이템을 추가하는 함수
+		 */ 
 		const createTodoItem = (text) => {
 			const elLi = document.createElement("li");
 			elLi.innerText = text;
 			elLi.classList.add("todo-item");
-			elLi.addEventListener("click", deletedList);
+			elLi.addEventListener("click", addLineThrough);
 			elList.appendChild(elLi);
 			//로컬스토리지에도 추가
 			addLocalStorage(text);
 		}
 
-		//// 투두리스트의 아이템을 클릭했을 때 취소선 긋는 함수
-		const elList = document.getElementById("todo-list");
-		const deletedList = (e) => {
+		/** 
+		 * 이벤트 타겟에 deleted 클래스를 추가하는 함수
+		 * (투두리스트의 아이템을 클릭했을 때 취소선 긋기용)
+		 * @param {e} 이벤트 타겟
+		 * @returns {void}
+		 */
+		const addLineThrough = (e) => {
 			const isContains = e.target.classList.contains("deleted");
 			if (isContains) {
 				e.target.classList.remove("deleted");
@@ -170,13 +183,34 @@
 			}
 		}
 
-		//// 입력된 텍스트를 가져와 투두리스트와 배열에 추가하는 함수
+		/** 
+		 * 이벤트 타겟의 가장 가까운 li 요소를 삭제하는 함수
+		 * (투두리스트의 삭제버튼을 클릭했을 때 화면에서 삭제하는데 사용)
+		 * @param {e} 이벤트 타겟
+		 * @returns {void}
+		 */
+		const removeList = (e) => {
+			if (e.target.classList.contains("delete-button")) {
+				const listItem = e.target.closest('li');
+				if (listItem) {
+					listItem.remove();
+				}
+			}
+		}
+
+		/** 
+		 * 입력된 텍스트를 가져와 투두리스트와 배열에 추가하는 함수
+		 * (input태그의 입력된 텍스트를 투두리스트에 추가하는데 사용)
+		 * 아이디 "text"를 가진 요소 필요
+		 * @returns {void}
+		 */ 
 		const addTodoItem = () => {
 			const text = document.getElementById("text");
 			if (text.value == "") return;
 			createTodoItem(text.value);
 			text.value = "";
 		}
+
 		/* ############### Functions end ################# */
 
 		//// 상단의 날짜 표시
@@ -206,11 +240,19 @@
 
 		////투두리스트 전체를 순회하며 투두리스트 영역에 추가
 		todoList.forEach(text => {
+			// li태그 추가
 			const liElement = document.createElement("li");
 			liElement.innerText = text;
 			liElement.classList.add("todo-item");
-			liElement.addEventListener("click", deletedList);
+			liElement.addEventListener("click", addLineThrough);
 			elList.appendChild(liElement);
+
+			// li태그 안에 button태그 추가
+			const btnElement = document.createElement("button");
+			btnElement.innerText = "x";
+			btnElement.classList.add("delete-button");
+			btnElement.addEventListener("click", (e) => { removeList(e); removeLocalStorage(text)})
+			liElement.appendChild(btnElement);
 		});
 
 		//// Add버튼을 클릭했을 때 투두리스트가 추가되도록 이벤트 리스닝 추가
