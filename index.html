@@ -88,6 +88,10 @@
 			cursor: pointer;
 		}
 
+		.hidden {
+			display: none;
+		}
+
 		.delete-button:hover {
 			background-color: red;
 		}
@@ -164,6 +168,14 @@
 			elLi.classList.add("todo-item");
 			elLi.addEventListener("click", addLineThrough);
 			elList.appendChild(elLi);
+
+			// li태그 안에 button태그 추가
+			const btnElement = document.createElement("button");
+			btnElement.innerText = "x";
+			btnElement.classList.add("delete-button");
+			btnElement.addEventListener("click", (e) => { removeList(e); removeLocalStorage(text); })
+			elLi.appendChild(btnElement);
+
 			//로컬스토리지에도 추가
 			addLocalStorage(text);
 		}
@@ -178,8 +190,10 @@
 			const isContains = e.target.classList.contains("deleted");
 			if (isContains) {
 				e.target.classList.remove("deleted");
+				e.target.getElementsByClassName("delete-button")[0].classList.add("hidden");
 			} else {
 				e.target.classList.add("deleted");
+				e.target.getElementsByClassName("delete-button")[0].classList.remove("hidden");
 			}
 		}
 
