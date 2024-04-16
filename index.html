@@ -124,7 +124,7 @@
 	<!-- HTML Body  -->
 	<div class="container">
 		<!-- Date display area -->
-		<div class="date">2024/04/09(火)</div>
+		<div class="date">yyyy/mm/dd(aaa)</div>
 		<!-- Todo-List display area -->
 		<div class="todo-box">
 			<ul id="todo-list"></ul>
@@ -224,49 +224,53 @@
 			text.value = "";
 		}
 
-		/* ############### Functions end ################# */
-
-		//// 상단의 날짜 표시
-		const dateElement = document.getElementsByClassName("date")[0];
-		const today = new Date();
-		const option = {
-			year: "numeric",
-			month: "2-digit",
-			day: "2-digit",
-			weekday: 'short',
-		}
-		dateElement.innerText = today.toLocaleDateString(undefined, option);
-
-		////투두리스트 변수 선언
-		let todoList = [];
-		
-		////로컬스토리지에서 저장된 데이터를 가져옴
-		let storageList = localStorage.getItem('todoList');
-
-		////데이터가 존재하면 파싱하여 todoList에 세팅
-		////존재하지 않으면 빈 배열을 로컬스토리지에 저장
-		if (storageList) {
-			todoList = JSON.parse(storageList);
-		} else {
-			localStorage.setItem('todoList', JSON.stringify(todoList));
-		}
-
-		////투두리스트 전체를 순회하며 투두리스트 영역에 추가
-		todoList.forEach(text => {
-			createTodoItem(text);
-		});
-
-		//// Add버튼을 클릭했을 때 투두리스트가 추가되도록 이벤트 리스닝 추가
-		const btnAdd = document.getElementById("btn-add");
-		btnAdd.addEventListener("click", addTodoItem);
-
-		//// 텍스트박스에서 엔터를 눌러도 등록 동작이 실행되도록
-		const text = document.getElementById("text");
-		text.addEventListener("keypress", (e) => {
-			if (e.keyCode === 13) {
-				addTodoItem();
+		////////////////////////////////////////////////
+		/* ▽▽▽▽▽▽▽▽ Main Start ▽▽▽▽▽▽▽▽ */
+		{
+			//// 상단의 날짜 표시
+			const dateElement = document.getElementsByClassName("date")[0];
+			const today = new Date();
+			const option = {
+				year: "numeric",
+				month: "2-digit",
+				day: "2-digit",
+				weekday: 'short',
 			}
-		})
+			dateElement.innerText = today.toLocaleDateString(undefined, option);
+
+			////투두리스트 변수 선언
+			let todoList = [];
+			
+			////로컬스토리지에서 저장된 데이터를 가져옴
+			let storageList = localStorage.getItem('todoList');
+
+			////데이터가 존재하면 파싱하여 todoList에 세팅
+			////존재하지 않으면 빈 배열을 로컬스토리지에 저장
+			if (storageList) {
+				todoList = JSON.parse(storageList);
+			} else {
+				localStorage.setItem('todoList', JSON.stringify(todoList));
+			}
+
+			////투두리스트 전체를 순회하며 투두리스트 영역에 추가
+			todoList.forEach(text => {
+				createTodoItem(text);
+			});
+
+			//// Add버튼을 클릭했을 때 투두리스트가 추가되도록 이벤트 리스닝 추가
+			const btnAdd = document.getElementById("btn-add");
+			btnAdd.addEventListener("click", addTodoItem);
+
+			//// 텍스트박스에서 엔터를 눌러도 등록 동작이 실행되도록
+			const text = document.getElementById("text");
+			text.addEventListener("keypress", (e) => {
+				if (e.keyCode === 13) {
+					addTodoItem();
+				}
+			})
+		}
+		/* △△△△△△△△ Main End △△△△△△△△ */
+		////////////////////////////////////////////////
 		
 	</script>
 </body>
