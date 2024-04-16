@@ -173,11 +173,9 @@
 			const btnElement = document.createElement("button");
 			btnElement.innerText = "x";
 			btnElement.classList.add("delete-button");
+			btnElement.classList.add("hidden");
 			btnElement.addEventListener("click", (e) => { removeList(e); removeLocalStorage(text); })
 			elLi.appendChild(btnElement);
-
-			//로컬스토리지에도 추가
-			addLocalStorage(text);
 		}
 
 		/** 
@@ -222,6 +220,7 @@
 			const text = document.getElementById("text");
 			if (text.value == "") return;
 			createTodoItem(text.value);
+			addLocalStorage(text.value);
 			text.value = "";
 		}
 
@@ -254,19 +253,7 @@
 
 		////투두리스트 전체를 순회하며 투두리스트 영역에 추가
 		todoList.forEach(text => {
-			// li태그 추가
-			const liElement = document.createElement("li");
-			liElement.innerText = text;
-			liElement.classList.add("todo-item");
-			liElement.addEventListener("click", addLineThrough);
-			elList.appendChild(liElement);
-
-			// li태그 안에 button태그 추가
-			const btnElement = document.createElement("button");
-			btnElement.innerText = "x";
-			btnElement.classList.add("delete-button");
-			btnElement.addEventListener("click", (e) => { removeList(e); removeLocalStorage(text)})
-			liElement.appendChild(btnElement);
+			createTodoItem(text);
 		});
 
 		//// Add버튼을 클릭했을 때 투두리스트가 추가되도록 이벤트 리스닝 추가
