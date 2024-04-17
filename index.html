@@ -124,15 +124,15 @@
 	<!-- HTML Body  -->
 	<div class="container">
 		<!-- Date display area -->
-		<div class="date">yyyy/mm/dd(aaa)</div>
+		<div id="date-display" class="date">yyyy/mm/dd(aaa)</div>
 		<!-- Todo-List display area -->
 		<div class="todo-box">
-			<ul id="todo-list"></ul>
+			<ul id="list-todo"></ul>
 		</div>
 		<!-- Inputbox display area -->
 		<div class="input-area">
 			<label class="label">
-				<input id="text" class="text" type="text" autocomplete="off"/>
+				<input id="input-text" class="text" type="text" autocomplete="off"/>
 			</label>
 			<div id="btn-add" class="btn">Add</div>
 		</div>
@@ -141,47 +141,84 @@
 	<!-- Javascript  -->
 	<script type="module" defer>
 
-		const elList = document.getElementById("todo-list");
+		/* -------------------------------- */
+		/* Global Variables					*/
+		/* -------------------------------- */
+		let todoList = [];
+		const dateDisplayEl = document.getElementById("date-display");
+		const todoListEl = document.getElementById("list-todo");
+		const textInputEl = document.getElementById("input-text");
+		const addButtonEl = document.getElementById("btn-add");
 
-		/** 
-		 * 로컬스토리지에 투두리스트를 추가하는 함수
-		 */ 
-		const addLocalStorage = (todo) => {
-			todoList.push(todo);
-			localStorage.setItem('todoList', JSON.stringify(todoList));
+		/* -------------------------------- */
+		/* Functions						*/
+		/* -------------------------------- */
+
+		/**
+		 * 초기화 함수
+		 * @returns {void}
+		 */
+		const initialize = () => {
+			//// 상단의 날짜 표시
+			const today = new Date();
+			const option = {
+				year: "numeric",
+				month: "2-digit",
+				day: "2-digit",
+				weekday: 'short',
+			}
+			dateDisplayEl.innerText = today.toLocaleDateString(undefined, option);
+
+			////로컬스토리지에서 저장된 데이터를 확인해서
+			////데이터가 존재하면 파싱하여 todoList에 세팅
+			let initList = [];
+			let storageList = localStorage.getItem('todoList');
+			if (storageList) {
+				initList = JSON.parse(storageList);
+			}
+
+			////로컬스토리지를 초기화하고
+			////투두리스트 전체를 순회하며 투두리스트 영역에 표시 & 로컬스토리지에 재저장
+			localStorage.setItem('todoList', JSON.stringify([]));
+			initList.forEach(todoText => {
+				createTodoItem(todoText);
+			});
+
 		};
 		
 		/** 
-		 * 로컬스토리지에 투두리스트를 삭제하는 함수
-		 */
-		const removeLocalStorage = (todo) => {
-			todoList.splice(todoList.indexOf(todo), 1);
-			localStorage.setItem('todoList', JSON.stringify(todoList));
-		}
-
-		/** 
 		 * 투두리스트 영역에 아이템을 추가하는 함수
+		 * @param {string} todoText 투두리스트에 추가하려고 하는 텍스트
+		 * @returns {void}
 		 */ 
-		const createTodoItem = (text) => {
-			const elLi = document.createElement("li");
-			elLi.innerText = text;
-			elLi.classList.add("todo-item");
-			elLi.addEventListener("click", addLineThrough);
-			elList.appendChild(elLi);
+		const createTodoItem = (todoText) => {
+			// li 생성
+			const liEl = document.createElement("li");
+			liEl.innerText = todoText;
+			liEl.classList.add("todo-item");
+			liEl.addEventListener("click", addLineThrough);
+			todoListEl.appendChild(liEl);
 
-			// li태그 안에 button태그 추가
-			const btnElement = document.createElement("button");
-			btnElement.innerText = "x";
-			btnElement.classList.add("delete-button");
-			btnElement.classList.add("hidden");
-			btnElement.addEventListener("click", (e) => { removeList(e); removeLocalStorage(text); })
-			elLi.appendChild(btnElement);
+			// li 안에 삭제용 button 추가
+			const buttonEl = document.createElement("button");
+			buttonEl.innerText = "x";
+			buttonEl.classList.add("delete-button");
+			buttonEl.classList.add("hidden");
+			buttonEl.addEventListener("click", (e) => { removeTodoItem(e); })
+			liEl.appendChild(buttonEl);
+
+			// 로컬 스토리지에 투두리스트 추가
+			todoList.push(todoText);
+			localStorage.setItem('todoList', JSON.stringify(todoList));
+
+			// textInput을 공백으로
+			textInputEl.value = "";
 		}
 
 		/** 
-		 * 이벤트 타겟에 deleted 클래스를 추가하는 함수
+		 * 이벤트 발생 객체에 클래스명 "deleted"를 추가하는 함수
 		 * (투두리스트의 아이템을 클릭했을 때 취소선 긋기용)
-		 * @param {e} 이벤트 타겟
+		 * @param {PointEvent} e 이벤트 객체
 		 * @returns {void}
 		 */
 		const addLineThrough = (e) => {
@@ -196,81 +233,38 @@
 		}
 
 		/** 
-		 * 이벤트 타겟의 가장 가까운 li 요소를 삭제하는 함수
+		 * 이벤트 발생 객체가 삭제버튼일 때, 가장 가까운 상위 li 요소를 삭제하는 함수
 		 * (투두리스트의 삭제버튼을 클릭했을 때 화면에서 삭제하는데 사용)
-		 * @param {e} 이벤트 타겟
+		 * @param {PointEvent} e 이벤트 객체
 		 * @returns {void}
 		 */
-		const removeList = (e) => {
+		const removeTodoItem = (e) => {
 			if (e.target.classList.contains("delete-button")) {
 				const listItem = e.target.closest('li');
 				if (listItem) {
+					todoList.splice(todoList.indexOf(listItem.innerText.slice(0, -1)), 1);
+					localStorage.setItem('todoList', JSON.stringify(todoList));
 					listItem.remove();
 				}
 			}
 		}
 
-		/** 
-		 * 입력된 텍스트를 가져와 투두리스트와 배열에 추가하는 함수
-		 * (input태그의 입력된 텍스트를 투두리스트에 추가하는데 사용)
-		 * 아이디 "text"를 가진 요소 필요
-		 * @returns {void}
-		 */ 
-		const addTodoItem = () => {
-			const text = document.getElementById("text");
-			if (text.value == "") return;
-			createTodoItem(text.value);
-			addLocalStorage(text.value);
-			text.value = "";
-		}
-
-		////////////////////////////////////////////////
-		/* ▽▽▽▽▽▽▽▽ Main Start ▽▽▽▽▽▽▽▽ */
-		{
-			//// 상단의 날짜 표시
-			const dateElement = document.getElementsByClassName("date")[0];
-			const today = new Date();
-			const option = {
-				year: "numeric",
-				month: "2-digit",
-				day: "2-digit",
-				weekday: 'short',
+		/* -------------------------------- */
+		/* Event Listeners					*/
+		/* -------------------------------- */
+		addButtonEl.addEventListener("click", () => {
+			createTodoItem(textInputEl.value);
+		});
+		textInputEl.addEventListener("keypress", (e) => {
+			if (e.keyCode === 13) {
+				createTodoItem(textInputEl.value);
 			}
-			dateElement.innerText = today.toLocaleDateString(undefined, option);
+		})
 
-			////투두리스트 변수 선언
-			let todoList = [];
-			
-			////로컬스토리지에서 저장된 데이터를 가져옴
-			let storageList = localStorage.getItem('todoList');
-
-			////데이터가 존재하면 파싱하여 todoList에 세팅
-			////존재하지 않으면 빈 배열을 로컬스토리지에 저장
-			if (storageList) {
-				todoList = JSON.parse(storageList);
-			} else {
-				localStorage.setItem('todoList', JSON.stringify(todoList));
-			}
-
-			////투두리스트 전체를 순회하며 투두리스트 영역에 추가
-			todoList.forEach(text => {
-				createTodoItem(text);
-			});
-
-			//// Add버튼을 클릭했을 때 투두리스트가 추가되도록 이벤트 리스닝 추가
-			const btnAdd = document.getElementById("btn-add");
-			btnAdd.addEventListener("click", addTodoItem);
-
-			//// 텍스트박스에서 엔터를 눌러도 등록 동작이 실행되도록
-			const text = document.getElementById("text");
-			text.addEventListener("keypress", (e) => {
-				if (e.keyCode === 13) {
-					addTodoItem();
-				}
-			})
-		}
-		/* △△△△△△△△ Main End △△△△△△△△ */
-		////////////////////////////////////////////////
+		/* -------------------------------- */
+		/* Execute Initialize Function		*/
+		/* -------------------------------- */
+		initialize();
 		
 	</script>
 </body>
