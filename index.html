@@ -38,11 +38,25 @@
 			background-color: #ffffffcc;
 		}
 
+		#list-todo {
+			display: flex;
+			flex-direction: column;
+		}
+
+		input[type="checkbox"], label {
+			cursor: pointer;
+		}
+
+		li {
+			display: inline-block;
+		}
+
 		.todo-item {
 			color: #000000;
 			font-size: x-large;
 			user-select: none;
 			cursor: pointer;
+			list-style-type: none;
 		}
 
 		.todo-item:hover {
@@ -194,7 +208,7 @@
 		const createTodoItem = (todoText) => {
 			// li 생성
 			const liEl = document.createElement("li");
-			liEl.innerText = todoText;
+			liEl.innerHTML = `<input type='checkbox' id='${todoText}'/><label for='${todoText}'>${todoText}</label>`;
 			liEl.classList.add("todo-item");
 			liEl.addEventListener("click", addLineThrough);
 			todoListEl.appendChild(liEl);
@@ -213,7 +227,7 @@
 
 			// textInput을 공백으로
 			textInputEl.value = "";
-		}
+		};
 
 		/** 
 		 * 이벤트 발생 객체에 클래스명 "deleted"를 추가하는 함수
@@ -225,12 +239,12 @@
 			const isContains = e.target.classList.contains("deleted");
 			if (isContains) {
 				e.target.classList.remove("deleted");
-				e.target.getElementsByClassName("delete-button")[0].classList.add("hidden");
+				e.target.closest('li').getElementsByClassName("delete-button")[0].classList.add("hidden");
 			} else {
 				e.target.classList.add("deleted");
-				e.target.getElementsByClassName("delete-button")[0].classList.remove("hidden");
+				e.target.closest('li').getElementsByClassName("delete-button")[0].classList.remove("hidden");
 			}
-		}
+		};
 
 		/** 
 		 * 이벤트 발생 객체가 삭제버튼일 때, 가장 가까운 상위 li 요소를 삭제하는 함수
@@ -247,7 +261,7 @@
 					listItem.remove();
 				}
 			}
-		}
+		};
 
 		/* -------------------------------- */
 		/* Event Listeners					*/
@@ -255,11 +269,12 @@
 		addButtonEl.addEventListener("click", () => {
 			createTodoItem(textInputEl.value);
 		});
+
 		textInputEl.addEventListener("keypress", (e) => {
 			if (e.keyCode === 13) {
 				createTodoItem(textInputEl.value);
-			}
-		})
+			};
+		});
 
 		/* -------------------------------- */
 		/* Execute Initialize Function		*/
