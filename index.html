@@ -23,7 +23,13 @@
 			align-items: center;
 		}
 
-		.date {
+		.top-area {
+			min-width: 350px;
+			display: flex;
+			justify-content: space-between;
+		}
+
+		.top-area > .date {
 			font-weight: 800;
 			font-size: x-large;
 		}
@@ -138,7 +144,10 @@
 	<!-- HTML Body  -->
 	<div class="container">
 		<!-- Date display area -->
-		<div id="date-display" class="date">yyyy/mm/dd(aaa)</div>
+		<div class="top-area">
+			<div id="date-display" class="date">yyyy/mm/dd(aaa)</div>
+			<button id="btn-all-delete" class="hidden" type="button">All Delete</button>
+		</div>
 		<!-- Todo-List display area -->
 		<div class="todo-box">
 			<ul id="list-todo"></ul>
@@ -163,6 +172,7 @@
 		const todoListEl = document.getElementById("list-todo");
 		const textInputEl = document.getElementById("input-text");
 		const addButtonEl = document.getElementById("btn-add");
+		const allDeleteEl = document.getElementById("btn-all-delete");
 
 		/* -------------------------------- */
 		/* Functions						*/
@@ -244,6 +254,7 @@
 				e.target.classList.add("deleted");
 				e.target.closest('li').getElementsByClassName("delete-button")[0].classList.remove("hidden");
 			}
+			checkAllListOfCheckedStatus();
 		};
 
 		/** 
@@ -253,8 +264,9 @@
 		 * @returns {void}
 		 */
 		const removeTodoItem = (e) => {
-			if (e.target.classList.contains("delete-button")) {
-				const listItem = e.target.closest('li');
+			const element = e instanceof Event ? e.target : e;
+			if (element.classList.contains("delete-button")) {
+				const listItem = element.closest('li');
 				if (listItem) {
 					todoList.splice(todoList.indexOf(listItem.innerText.slice(0, -1)), 1);
 					localStorage.setItem('todoList', JSON.stringify(todoList));
@@ -262,6 +274,35 @@
 				}
 			}
 		};
+
+		/**
+		 * TodoList내에 체크된 리스트가 있다면면 All Delete 버튼을 표시하고
+		 * 체크된 리스트가 없을 경우 All Delete 버튼을 숨김
+		 * @returns {void}
+		*/
+		const checkAllListOfCheckedStatus = () => {
+			const list = document.getElementsByClassName("deleted");
+			if(list.length > 0) {
+				allDeleteEl.classList.remove("hidden");
+			} else {
+				allDeleteEl.classList.add("hidden");
+			}
+		}
+
+		/**
+		 * 리스트를 순회하면서 체크된 리스트를 확인해서 삭제하고 All Delete 버튼을 숨김
+		 * @returns {void}
+		*/
+		const deleteAllListOfCheckedStatus = () => {
+			const list = Array.from(document.querySelectorAll("input.deleted"));
+			list.forEach(item => {
+				const deleteButton = item.closest('li').querySelector(".delete-button");
+				if (deleteButton) {
+					removeTodoItem(deleteButton);
+				}
+			})
+			allDeleteEl.classList.add("hidden");
+		}
 
 		/* -------------------------------- */
 		/* Event Listeners					*/
@@ -271,10 +312,14 @@
 		});
 
 		textInputEl.addEventListener("keypress", (e) => {
-			if (e.keyCode === 13) {
+			if (e.key === "Enter") {
 				createTodoItem(textInputEl.value);
 			};
 		});
+
+		allDeleteEl.addEventListener("click", () => {
+			deleteAllListOfCheckedStatus();
+		})
 
 		/* -------------------------------- */
 		/* Execute Initialize Function		*/
